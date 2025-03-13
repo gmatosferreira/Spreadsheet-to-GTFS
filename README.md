@@ -1,10 +1,10 @@
 # Spreadsheet to GTFS
 
 This document proposes a simple approach to create GTFS files from
-spreadsheets. To run it, you just need at least one route schedule, in
-the form of a CSV file, with the route stops as rows and each trip as a
-column, being the first column the stop name. Below is provided an
-example.
+spreadsheets, using R. To run it, you just need at least one route
+schedule, in the form of a CSV file, with the route stops as rows and
+each trip as a column, being the first column the stop name. Below is
+provided an example.
 
 |                 |          |          |          |          |          |
 |-----------------|----------|----------|----------|----------|----------|
