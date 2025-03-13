@@ -29,6 +29,7 @@ This section describes the procedure to create the GTFS file. Start by loading t
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(dplyr)
+library(tibble)
 library(rlang)
 ```
 
@@ -38,6 +39,8 @@ library(rlang)
 __This code should be edited before executed.__ It is where you define the parameters of the GTFS feed, namely:
 - The folder at which the CSV files are placed, `folder_input`;
 - The folder at which the generated GTFS should de stored, `folder_output`;
+- An __optional__ `stops.csv` file, that if provided will be used as the base file for the GTFS stops, using the ids of the stops provided and generating new ones for those that exist in the routes CSV but do not match any;
+> __Notice that the `stop_lat` and `stop_lon` values are initialized with a default 0 value for every stop that was not provided in the `stops.txt`. They must be manually editted!__
 - The agency information, which will be used for the `agency.txt`;
 - The services dates list, which will be used for the `calendar.txt`, and for each, the associated `routes`, a list of the CSV files that contain each route's stops and times (without the `.csv` extension).
 
@@ -48,6 +51,7 @@ agency <- list(
   # Folders
   folder_input="MTS/Input",
   folder_output="MTS/Output",
+  stops="MTS/Input/stops.txt",
   # Agency data (agency.txt)
   agency_id="MTS",
   agency_name="Metro Sul do Tejo",
@@ -87,7 +91,12 @@ gtfs_calendar = data.frame(agency$services[c("service_id", "monday", "tuesday", 
 gtfs_routes = tibble(route_id=character(), route_long_name=character(), route_type=integer())
 gtfs_trips = tibble(route_id=character(), service_id=character(), trip_id=character())
 gtfs_stop_times = tibble(trip_id=character(), arrival_time=character(), departure_time=character(), stop_id=character(), stop_sequence=integer())
-gtfs_stops = tibble(stop_id=character(), stop_name=character())
+
+if (is.null(agency$stops)) {
+  gtfs_stops = tibble(stop_id=character(), stop_name=character())
+} else {
+  gtfs_stops = read.csv(agency$stops)[c("stop_id", "stop_name", "stop_lat", "stop_lon")]
+}
 ```
 
 ### Iterate through services and routes
@@ -109,7 +118,7 @@ for (i in seq(length(agency$services$service_id))){
 
   # For each, analyse the several routes...
   for(ti in seq( length( agency$services$routes[[i]] ) ) ) {
-    route_name = agency$services$routes[[i]][ti]
+    route_name = unlist(agency$services$routes[[i]][ti])
     print(sprintf("> Analysing route %s...", route_name ))
     schedule <- read.csv(sprintf("%s/%s.csv", agency$folder_input, route_name), header=FALSE)
     print(sprintf("> There are %s stops and %d trips...", nrow(schedule), ncol(schedule)-1 ))
@@ -127,8 +136,23 @@ for (i in seq(length(agency$services$service_id))){
       trip_gtfs = tibble(route_id=route_id, service_id=service_id, trip_id=trip_id)
       gtfs_trips <<- rbind(gtfs_trips, trip_gtfs)
       
+      stops = schedule[[1]]
+      stop_ids = list()
+      for(si in seq(length(stops))) {
+        # Check if stop already exists in gtfs_stops
+        stop_id <- 0
+        if (!any(gtfs_stops$stop_name == stops[si])) { # If not, create it
+          stop_id <- rlang::hash(stops[si])
+          gtfs_stops <<- rbind(gtfs_stops, tibble(stop_id=stop_id, stop_name=stops[si], stop_lat=0.0, stop_lon=0.0))  
+        } else { # Otherwise, use id that is already associated to it
+          stop_id <- gtfs_stops$stop_id[gtfs_stops$stop_name==stops[si]]
+        }
+        stop_ids[si] <- stop_id
+      }
+
       data.frame(
-        stop_id = sapply(schedule[[1]], rlang::hash),
+        "stop_id" = unlist(stop_ids),
+        # stop_id = sapply(schedule[[1]], rlang::hash),
         stop_name = schedule[[1]],
         arrival_time = schedule[[trip_name]],
         departure_time = schedule[[trip_name]],
@@ -140,26 +164,16 @@ for (i in seq(length(agency$services$service_id))){
     })
     trips_df <- bind_rows(trips)
     
-    gtfs_stops <<- rbind(gtfs_stops, data.frame(trips_df[c("stop_id", "stop_name")]))
-    
     gtfs_stop_times <<- rbind(gtfs_stop_times, trips_df[c("trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence")])
-    print(sprintf(">> Processed %d trips associated to route!", trip_counter))
   }
 }
+View(gtfs_routes)
 ```
 
-A final adjustment must be performed over the `gtfs_stops`, as stops are appended to this list for every route, and we just want one instance of each. Lets filter it to make sure we have unique stop_ids. 
-
-__Notice that the `stop_lat` and `stop_lon` values are initialized with a default 0 value for every stop. They must be manually editted!__
 
 ```{r echo=TRUE}
-# Filter stops to have unique values by ID, and append latitude and longitude values (THEY SHOULD BE MANUALLY EDITTED!)
-gtfs_stops <- gtfs_stops %>%
-  distinct(stop_id, .keep_all = TRUE)
-gtfs_stops[["stop_lat"]] = 0.0
-gtfs_stops[["stop_lon"]] = 0.0
-
-gtfs_trips[["shape_id"]] = ""
+# Preventing error when creating shapes.txt (GTFSWizard requires this attribute, even if empty)
+gtfs_trips[["shape_id"]] = NA
 ```
 
 ## Build GTFS file
@@ -177,8 +191,8 @@ if (!dir.exists(gtfs_folder)) dir.create(gtfs_folder)
 write.csv(gtfs_agency, file.path(gtfs_folder, "agency.txt"), row.names = FALSE)
 write.csv(gtfs_calendar, file.path(gtfs_folder, "calendar.txt"), row.names = FALSE)
 write.csv(gtfs_stops, file.path(gtfs_folder, "stops.txt"), row.names = FALSE)
-# write.csv(gtfs_routes, file.path(gtfs_folder, "routes.txt"), row.names = FALSE)
-write.csv(gtfs_trips, file.path(gtfs_folder, "trips.txt"), row.names = FALSE)
+write.csv(gtfs_routes, file.path(gtfs_folder, "routes.txt"), row.names = FALSE)
+write.csv(gtfs_trips, file.path(gtfs_folder, "trips.txt"), row.names = FALSE, na = "")
 write.csv(gtfs_stop_times, file.path(gtfs_folder, "stop_times.txt"), row.names = FALSE)
 ```
 

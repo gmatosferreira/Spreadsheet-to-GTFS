@@ -1,0 +1,3 @@
+"route_id","route_long_name","route_type"
+"1","Linha1_Cacilhas_Uteis",5
+"2","Linha2_Pragal_Sabados",5
