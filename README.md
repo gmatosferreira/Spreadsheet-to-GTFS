@@ -34,19 +34,27 @@ library(rlang)
 ### Parameters
 
 **This code should be edited before executed.** It is where you define
-the parameters of the GTFS feed, namely: - The folder at which the CSV
-files are placed, `folder_input`; - The folder at which the generated
-GTFS should de stored, `folder_output`; - An **optional** `stops.csv`
-file, that if provided will be used as the base file for the GTFS stops,
-using the ids of the stops provided and generating new ones for those
-that exist in the routes CSV but do not match any; \> **Notice that the
-`stop_lat` and `stop_lon` values are initialized with a default 0 value
-for every stop that was not provided in the `stops.txt`. They must be
-manually editted!** - The agency information, which will be used for the
-`agency.txt`; - The services dates list, which will be used for the
-`calendar.txt`, and for each, the associated `routes`, a list of the CSV
-files that contain each route’s stops and times (without the `.csv`
-extension).
+the parameters of the GTFS feed, namely:
+
+-   The folder at which the CSV files are placed, `folder_input`;
+
+-   The folder at which the generated GTFS should de stored,
+    `folder_output`;
+
+-   An **optional** `stops.csv` file, that if provided will be used as
+    the base file for the GTFS stops, using the ids of the stops
+    provided and generating new ones for those that exist in the routes
+    CSV but do not match any;
+
+> **Notice that the `stop_lat` and `stop_lon` values are initialized
+> with a default 0 value for every stop that was not provided in the
+> `stops.txt`. They must be manually editted!**
+
+-   The agency information, which will be used for the `agency.txt`;
+
+-   The services dates list, which will be used for the `calendar.txt`,
+    and for each, the associated `routes`, a list of the CSV files that
+    contain each route’s stops and times (without the `.csv` extension).
 
 After editting this, you should be able to run the code
 
