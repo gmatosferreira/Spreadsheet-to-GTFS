@@ -47,8 +47,7 @@ library(rlang)
 
 ### Parameters
 
-**This code should be edited before executed.** It is where you define
-the parameters of the GTFS feed, namely:
+This is where the parameters of the GTFS feed are defined, namely:
 
 -   The folder at which the CSV files are placed, `folder_input`;
 
@@ -69,8 +68,6 @@ the parameters of the GTFS feed, namely:
 -   The services dates list, which will be used for the `calendar.txt`,
     and for each, the associated `routes`, a list of the CSV files that
     contain each route’s stops and times (without the `.csv` extension).
-
-After editting this, you should be able to run the code
 
 ``` r
 agency <- list(
