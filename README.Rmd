@@ -1,13 +1,8 @@
 ---
 title: "Spreadsheet to GTFS"
 output: 
-  html_document:
-      toc: true
-      toc_float: true
-      toc_collapsed: true
-      toc_depth: 3
-      number_sections: true
-      theme: lumen
+  md_document:
+    variant: markdown_github
 ---
 
 
