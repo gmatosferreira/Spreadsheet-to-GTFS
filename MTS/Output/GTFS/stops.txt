@@ -1,0 +1,16 @@
+"stop_id","stop_name","stop_lat","stop_lon"
+"9b102fc3dd73232bf36db60e5845a439","Corroios",0,0
+"0bc6b25ec6bee38f1612598f2d5e8580","Casa do Povo",0,0
+"00d590f2d896631c48678dcad8391a4a","Santo Amaro",0,0
+"05e9e82896f6e93755425e18089c206d","Laranjeiro",0,0
+"5bfd09ad34f21ae971382ac750d59637","António Gedeão",0,0
+"f5bd39e5630af8c4b1b59dc132bd2b68","Parque da Paz",0,0
+"b7a2df864a7f70b0886d3f189c64d5ee","Cova da Piedade",0,0
+"74be273bf7427b42767db8e8bc51201d","Bento Gonçalves",0,0
+"9cf6659f420f07c66af454fcdc86852b","Almada",0,0
+"8bd17948d3602cfe556f6b622884602e","São João Baptista",0,0
+"8ea88358871967967b13b00f3dac2520","Gil Vicente",0,0
+"1d28f76f76cc1e0b27cfd35ef3b94ff7","25 de Abril",0,0
+"dfab58e605a1a453deca5988c6c91614","Cacilhas",0,0
+"63308ad2cdecfe1e080af69d3dd97ce2","Ramalha",0,0
+"9c622dc4fb51817542987866545c8ed7","Pragal",0,0
